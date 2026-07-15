@@ -19,7 +19,7 @@ The bound spreadsheet must have a sheet named `Main`. Each row is one analysis j
 
 Running "Journal Analyzer → Run analysis" processes exactly **one** row per invocation: the first row (top to bottom) with non-empty B/C and empty D. Multiple rows require multiple menu invocations.
 
-Each `.docx` filename must contain a date (`DD.MM.YYYY` or `DD.MM.YY`) identifying the day it reports on. The output written to D is one line per person, in order of first appearance across the processed files:
+Each `.docx` filename must contain a date (`DD.MM.YYYY`, `DD.MM.YY`, or `DD_MM_YYYY`) identifying the day it reports on. The output written to D is one line per person, in order of first appearance across the processed files:
 
 ```
 с-нт ІВАНОВ А.В. — 4 — 01.06.2026; 03.06.2026-05.06.2026
