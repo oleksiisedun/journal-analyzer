@@ -1,5 +1,5 @@
 const MAIN_SHEET_NAME = 'Main';
-const HEADER_LINE_MAX_LENGTH = 50;
+const HEADER_LINE_MAX_LENGTH = 100;
 const GENERIC_POSITION_HEADER_REGEX = /[«"“].+[»"”]/;
 
 const FOLDER_LINK_COLUMN = 'B2:B';
