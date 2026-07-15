@@ -4,7 +4,7 @@
  * @returns {string|null}
  */
 function extractDateFromFilename_(name) {
-  const match = name.match(/(\d{2})[._](\d{2})[._](\d{2}|\d{4})/);
+  const match = name.match(/(\d{2})[._](\d{2})[._](\d{4}|\d{2})/);
   if (!match) return null;
 
   const day = Number(match[1]);
