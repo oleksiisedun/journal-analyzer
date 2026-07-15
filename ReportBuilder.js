@@ -3,7 +3,7 @@
  * A block ends on: a line matching headerRegex (starts a new block instead), a quoted
  * "position name"-shaped line that does NOT match headerRegex (some other position), a
  * line longer than HEADER_LINE_MAX_LENGTH (non-personnel text), a blank line, or a line
- * with no whitespace (a single word can't be a "rank + surname + initials" name).
+ * with fewer than 3 words (a "rank + surname + initials" name always has at least 3).
  * @param {string[]} lines
  * @param {RegExp} headerRegex
  * @returns {string[]} trimmed personnel entries, in document order
@@ -25,9 +25,9 @@ function scanLinesForPersonnel_(lines, headerRegex) {
       continue;
     }
 
-    const isSingleWord = !/\s/.test(line);
+    const wordCount = line.split(/\s+/).filter(Boolean).length;
 
-    if (GENERIC_POSITION_HEADER_REGEX.test(line) || line.length > HEADER_LINE_MAX_LENGTH || isSingleWord) {
+    if (GENERIC_POSITION_HEADER_REGEX.test(line) || line.length > HEADER_LINE_MAX_LENGTH || wordCount < 3) {
       inMatchingBlock = false;
       continue;
     }
