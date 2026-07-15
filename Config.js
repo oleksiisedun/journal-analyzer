@@ -1,6 +1,7 @@
 const MAIN_SHEET_NAME = 'Main';
 const HEADER_LINE_MAX_LENGTH = 100;
 const GENERIC_POSITION_HEADER_REGEX = /[«"“].+[»"”]/;
+const BLOCK_END_REGEXES = [/ппд/i, /бпла/i];
 
 const FOLDER_LINK_COLUMN = 'B2:B';
 const REGEX_COLUMN = 'C2:C';
