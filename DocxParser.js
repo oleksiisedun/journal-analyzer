@@ -1,10 +1,10 @@
 /**
- * Extracts the first DD.MM.YYYY, DD.MM.YY, or DD_MM_YYYY date found in a filename, as an ISO YYYY-MM-DD string.
+ * Extracts the first DD.MM.YYYY, DD.MM.YY, DD_MM_YYYY, or DD-MM-YYYY date found in a filename, as an ISO YYYY-MM-DD string.
  * @param {string} name
  * @returns {string|null}
  */
 function extractDateFromFilename_(name) {
-  const match = name.match(/(\d{2})[._](\d{2})[._](\d{4}|\d{2})/);
+  const match = name.match(/(\d{2})[._-](\d{2})[._-](\d{4}|\d{2})/);
   if (!match) return null;
 
   const day = Number(match[1]);
