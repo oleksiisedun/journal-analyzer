@@ -2,7 +2,7 @@
  * Scans the Main sheet from row 2 down and returns the first row ready to process,
  * writing error markers into the report column for any invalid rows encountered along the way.
  * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet
- * @returns {{rowNum: number, reportCol: number, folder: GoogleAppsScript.Drive.Folder, regex: RegExp}|null}
+ * @returns {{rowNum: number, reportCol: number, folder: GoogleAppsScript.Drive.Folder}|null}
  */
 function findTargetRow_(sheet) {
   const lastRow = sheet.getLastRow();
@@ -14,9 +14,9 @@ function findTargetRow_(sheet) {
 
   for (let i = 0; i < values.length; i++) {
     const rowNum = i + 2;
-    const [link, regexStr, report] = values[i];
+    const [link, report] = values[i];
 
-    if (!link || !regexStr || report) continue;
+    if (!link || report) continue;
 
     const folder = parseFolderFromLink_(link);
     if (!folder) {
@@ -24,13 +24,7 @@ function findTargetRow_(sheet) {
       continue;
     }
 
-    const regex = compileRegex_(regexStr);
-    if (!regex) {
-      sheet.getRange(rowNum, reportCol).setValue(ERROR_INVALID_REGEX);
-      continue;
-    }
-
-    return { rowNum, reportCol, folder, regex };
+    return { rowNum, reportCol, folder };
   }
 
   return null;
@@ -76,17 +70,4 @@ function extractFolderId_(link) {
   if (/^[-\w]{10,}$/.test(link)) return link;
 
   return null;
-}
-
-/**
- * Compiles a regex string, returning null if it fails to compile.
- * @param {string} regexStr
- * @returns {RegExp|null}
- */
-function compileRegex_(regexStr) {
-  try {
-    return new RegExp(regexStr);
-  } catch (e) {
-    return null;
-  }
 }

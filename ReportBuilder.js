@@ -1,5 +1,7 @@
 /**
  * Scans document lines for personnel entries under matching position headers.
+ * Lines matching any of IGNORE_LINE_REGEXES are skipped entirely before any other check —
+ * they neither end nor extend the current block, and are never recorded as personnel.
  * A block ends on: a line matching headerRegex (starts a new block instead), a quoted
  * "position name"-shaped line that does NOT match headerRegex (some other position), a
  * line longer than HEADER_LINE_MAX_LENGTH (non-personnel text), a blank line, a line
@@ -15,6 +17,8 @@ function scanLinesForPersonnel_(lines, headerRegex) {
 
   for (const rawLine of lines) {
     const line = rawLine.trim();
+
+    if (IGNORE_LINE_REGEXES.some((regex) => regex.test(line))) continue;
 
     if (!line) {
       inMatchingBlock = false;

@@ -36,8 +36,6 @@ function runAnalyzer() {
     rowNum: target.rowNum,
     reportCol: target.reportCol,
     folderId: target.folder.getId(),
-    regexSource: target.regex.source,
-    regexFlags: target.regex.flags,
     fileIndex: 0,
     fileInfos: null,
     personOrder: [],
@@ -81,7 +79,6 @@ function processChunk(state) {
       state.skippedFiles = state.skippedFiles.concat(built.skippedFiles);
     }
 
-    const regex = new RegExp(state.regexSource, state.regexFlags);
     const totalCount = state.fileInfos.length;
     const startTime = Date.now();
 
@@ -89,7 +86,7 @@ function processChunk(state) {
       const info = state.fileInfos[state.fileIndex];
 
       try {
-        const entries = processFile_(info.id, regex);
+        const entries = processFile_(info.id, POSITION_HEADER_REGEX);
         for (const identity of entries) {
           if (!state.personDates[identity]) {
             state.personDates[identity] = {};
