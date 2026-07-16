@@ -27,23 +27,29 @@ Each `.docx` filename must contain a date (`DD.MM.YYYY`, `DD.MM.YY`, `DD_MM_YYYY
 
 ## Architecture
 
-Apps Script concatenates every `.js` file in the project into one global scope — file boundaries here are purely organizational, not module boundaries. `Menu.js` installs the custom menu, which calls the orchestrator in `Code.js`. It asks `SheetUtils.js` for the next eligible row, then for each `.docx` file in that row's folder uses `DriveUtils.js` to convert it to a temporary Google Doc and `DocxParser.js` to pull out its text lines. `ReportBuilder.js` scans those lines for personnel entries and builds the final report text, which is written back to the sheet.
+Apps Script concatenates every `.js` file in the project into one global scope — file boundaries here are purely organizational, not module boundaries. `Menu.js` installs the custom menu, which calls `runAnalyzer` in `Code.js`. It asks `SheetUtils.js` for the next eligible row, then opens the `Progress.html` dialog, which drives the actual folder processing in time-boxed chunks (avoiding Apps Script's 6-minute execution limit on large folders): client-side JS in the dialog repeatedly calls `processChunk` via `google.script.run`, and each call processes as many files as fit in a ~4-minute budget before returning progress and a resumable state for the next call. For each `.docx` file, `processChunk` uses `DriveUtils.js` to convert it to a temporary Google Doc and `DocxParser.js` to pull out its text lines, and `ReportBuilder.js` scans those lines for personnel entries. Once every file in the folder has been processed, `ReportBuilder.js` builds the final report text, which is written back to the sheet.
 
 ```mermaid
 graph TD
-  Menu["Menu.js\nonOpen"] --> Code
+  Menu["Menu.js\nonOpen"] --> runAnalyzer
 
-  subgraph Code["Code.js — orchestrator"]
-    runAnalyzer --> processFolder_
-    processFolder_ --> processFile_
+  subgraph Code["Code.js"]
+    runAnalyzer
+    processChunk
+    processFile_
+    runAnalyzer --> Dialog
+    processChunk --> processFile_
   end
 
+  Dialog["Progress.html\n(client JS)"] -- "google.script.run" --> processChunk
+  processChunk -- "state / progress" --> Dialog
+
   runAnalyzer --> SheetUtils["SheetUtils.js\nfindTargetRow_"]
-  processFolder_ --> DocxParser1["DocxParser.js\nextractDateFromFilename_"]
+  processChunk --> DocxParser1["DocxParser.js\nextractDateFromFilename_"]
   processFile_ --> DriveUtils["DriveUtils.js\nconvertDocxToGoogleDoc_ / trashFile_"]
   processFile_ --> DocxParser2["DocxParser.js\nextractLines_"]
   processFile_ --> ReportBuilder1["ReportBuilder.js\nscanLinesForPersonnel_"]
-  processFolder_ --> ReportBuilder2["ReportBuilder.js\nbuildReportText_"]
+  processChunk --> ReportBuilder2["ReportBuilder.js\nbuildReportText_"]
 
   DriveUtils --> Drive[("Google Drive")]
   DocxParser2 --> Docs[("Google Docs\n(temp conversion)")]

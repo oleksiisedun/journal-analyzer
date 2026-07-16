@@ -1,5 +1,6 @@
 const MAIN_SHEET_NAME = 'Main';
 const HEADER_LINE_MAX_LENGTH = 100;
+const CHUNK_TIME_BUDGET_MS = 1 * 60 * 1000;
 const GENERIC_POSITION_HEADER_REGEX = /[«"“].+[»"”]/;
 const BLOCK_END_REGEXES = [/ппд/i, /бпла/i];
 

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<style>
+  body { font-family: Arial, sans-serif; padding: 16px; margin: 0; }
+  #status { font-size: 13px; color: #333; }
+  #bar-track { background: #eee; border-radius: 4px; height: 10px; overflow: hidden; margin-top: 8px; }
+  #bar-fill { background: #4285f4; height: 100%; width: 0%; transition: width 0.3s; }
+  #skipped { margin-top: 12px; font-size: 12px; color: #a00; white-space: pre-wrap; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+  <div id="progress-view">
+    <div id="status">Starting…</div>
+    <div id="bar-track"><div id="bar-fill"></div></div>
+  </div>
+
+  <div id="result-view" class="hidden">
+    <div id="result-message"></div>
+    <div id="skipped"></div>
+  </div>
+
+  <div id="error-view" class="hidden">
+    <div id="error-message" style="color:#a00;"></div>
+  </div>
+
+<script>
+  var initialState = <?!= initialStateJson ?>;
+
+  function renderProgress(processed, total) {
+    document.getElementById('status').textContent =
+      total > 0 ? ('Processing file ' + processed + ' of ' + total + '…') : 'Scanning folder…';
+    var pct = total > 0 ? Math.round((processed / total) * 100) : 0;
+    document.getElementById('bar-fill').style.width = pct + '%';
+  }
+
+  function showDone(skippedFiles, processedCount, totalCount) {
+    document.getElementById('progress-view').classList.add('hidden');
+    document.getElementById('result-view').classList.remove('hidden');
+    document.getElementById('result-message').textContent =
+      'Done. Processed ' + processedCount + ' of ' + totalCount + ' file(s).';
+    if (skippedFiles && skippedFiles.length > 0) {
+      document.getElementById('skipped').textContent =
+        'Skipped ' + skippedFiles.length + ' file(s):\n' + skippedFiles.join('\n');
+    }
+  }
+
+  function showError(message) {
+    document.getElementById('progress-view').classList.add('hidden');
+    document.getElementById('error-view').classList.remove('hidden');
+    document.getElementById('error-message').textContent = 'Error: ' + message;
+  }
+
+  function runChunk(state) {
+    google.script.run
+      .withSuccessHandler(function (result) {
+        if (result.retry) {
+          setTimeout(function () { runChunk(state); }, 1000);
+          return;
+        }
+        renderProgress(result.processedCount, result.totalCount);
+        if (result.done) {
+          showDone(result.skippedFiles, result.processedCount, result.totalCount);
+          return;
+        }
+        runChunk(result.state);
+      })
+      .withFailureHandler(function (error) {
+        showError(error && error.message ? error.message : String(error));
+      })
+      .processChunk(state);
+  }
+
+  renderProgress(0, 0);
+  runChunk(initialState);
+</script>
+</body>
+</html>
