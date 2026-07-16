@@ -7,7 +7,7 @@
  * or a line matching any of BLOCK_END_REGEXES (other known non-personnel markers).
  * @param {string[]} lines
  * @param {RegExp} headerRegex
- * @returns {string[]} trimmed personnel entries, in document order
+ * @returns {string[]} trimmed personnel entries (trailing ";"/"." stripped), in document order
  */
 function scanLinesForPersonnel_(lines, headerRegex) {
   const entries = [];
@@ -39,7 +39,7 @@ function scanLinesForPersonnel_(lines, headerRegex) {
       continue;
     }
 
-    if (inMatchingBlock) entries.push(line);
+    if (inMatchingBlock) entries.push(line.replace(/[;.]+$/, ''));
   }
 
   return entries;
