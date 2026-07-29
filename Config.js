@@ -1,5 +1,4 @@
 const POSITION_HEADER_REGEX = /^.*ПВ\s+[«"“].+[»"”].{0,10}$/;
-
 const GENERIC_POSITION_HEADER_REGEX = /[«"“].+[»"”]/;
 const BLOCK_END_REGEXES = [/ппд/i, /бпла/i];
 const IGNORE_LINE_REGEXES = [/заведено:/i, /виведено:/i];
