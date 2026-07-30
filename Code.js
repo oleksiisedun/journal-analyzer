@@ -32,10 +32,17 @@ function runAnalyzer() {
     lock.releaseLock();
   }
 
+  const positionNames = readPositionNames_(target.positionListKey);
+  if (positionNames.length === 0) {
+    throw new Error(`No position names found for list "${target.positionListKey}" in "${HANDBOOK_SHEET_NAME}".`);
+  }
+  const positionRegexSource = buildPositionHeaderRegex_(positionNames).source;
+
   const initialState = {
     rowNum: target.rowNum,
     reportCol: target.reportCol,
     folderId: target.folder.getId(),
+    positionRegexSource,
     fileIndex: 0,
     fileInfos: null,
     personOrder: [],
@@ -81,12 +88,13 @@ function processChunk(state) {
 
     const totalCount = state.fileInfos.length;
     const startTime = Date.now();
+    const headerRegex = new RegExp(state.positionRegexSource);
 
     while (state.fileIndex < totalCount && Date.now() - startTime < CHUNK_TIME_BUDGET_MS) {
       const info = state.fileInfos[state.fileIndex];
 
       try {
-        const entries = processFile_(info.id, POSITION_HEADER_REGEX);
+        const entries = processFile_(info.id, headerRegex);
         for (const identity of entries) {
           if (!state.personDates[identity]) {
             state.personDates[identity] = {};

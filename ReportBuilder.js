@@ -1,4 +1,25 @@
 /**
+ * Builds a single regex matching a position-header line for any of the given position
+ * names, using POSITION_HEADER_TEMPLATE as the per-name shape.
+ * @param {string[]} positionNames non-empty, already-trimmed position names
+ * @returns {RegExp}
+ */
+function buildPositionHeaderRegex_(positionNames) {
+  const alternation = positionNames.map(escapeRegExp_).join('|');
+  const source = POSITION_HEADER_TEMPLATE.replace('POSITION_NAME', `(?:${alternation})`);
+  return new RegExp(source);
+}
+
+/**
+ * Escapes a string for safe interpolation into a RegExp source.
+ * @param {string} text
+ * @returns {string}
+ */
+function escapeRegExp_(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
  * Scans document lines for personnel entries under matching position headers.
  * Lines matching any of IGNORE_LINE_REGEXES are skipped entirely before any other check —
  * they neither end nor extend the current block, and are never recorded as personnel.
