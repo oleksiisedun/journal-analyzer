@@ -3,6 +3,8 @@ const POSITION_HEADER_TEMPLATE = '^.+[«"“]POSITION_NAME[»"”].+$';
 const GENERIC_POSITION_HEADER_REGEX = /[«"“].+[»"”]/;
 const BLOCK_END_REGEXES = [/ппд/i, /бпла/i];
 const LEADING_LIST_NUMBER_REGEX = /^\d+[).]\s*/;
+const LEADING_ROLE_LABELS = ['Пілот', 'Штурман'];
+const LEADING_ROLE_LABEL_REGEX = new RegExp(`^(?:${LEADING_ROLE_LABELS.join('|')}):\\s*`, 'i');
 const TRAILING_INITIAL_REGEX = /\p{Lu}\.$/u;
 const IGNORE_LINE_REGEXES = [
   /заведено:/i,

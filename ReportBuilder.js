@@ -21,9 +21,10 @@ function escapeRegExp_(text) {
 
 /**
  * Scans document lines for personnel entries under matching position headers.
- * Each line has a leading list-number marker (e.g. "1)", "2.") stripped before any other
- * check, so numbering never distorts word-count/header/block-end detection. Lines matching
- * any of IGNORE_LINE_REGEXES are then skipped entirely before any other check — they
+ * Each line has a leading list-number marker (e.g. "1)", "2.") and a leading role label
+ * (e.g. "Пілот:", "Штурман:" — LEADING_ROLE_LABELS in Config.js) stripped before any other
+ * check, so neither distorts word-count/header/block-end detection. Lines matching any of
+ * IGNORE_LINE_REGEXES are then skipped entirely before any other check — they
  * neither end nor extend the current block, and are never recorded as personnel.
  * A block ends on: a line matching headerRegex (starts a new block instead), a quoted
  * "position name"-shaped line that does NOT match headerRegex (some other position), a
@@ -39,7 +40,7 @@ function scanLinesForPersonnel_(lines, headerRegex) {
   let inMatchingBlock = false;
 
   for (const rawLine of lines) {
-    const line = rawLine.trim().replace(LEADING_LIST_NUMBER_REGEX, '');
+    const line = rawLine.trim().replace(LEADING_LIST_NUMBER_REGEX, '').replace(LEADING_ROLE_LABEL_REGEX, '');
 
     if (IGNORE_LINE_REGEXES.some((regex) => regex.test(line))) continue;
 
