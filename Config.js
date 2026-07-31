@@ -2,7 +2,13 @@ const POSITION_HEADER_TEMPLATE = '^.+[«"“]POSITION_NAME[»"”].+$';
 
 const GENERIC_POSITION_HEADER_REGEX = /[«"“].+[»"”]/;
 const BLOCK_END_REGEXES = [/ппд/i, /бпла/i];
-const IGNORE_LINE_REGEXES = [/заведено:/i, /виведено:/i, /провідник/i];
+const IGNORE_LINE_REGEXES = [
+  /заведено:/i,
+  /виведено:/i,
+  /заходить:/i,
+  /виходить:/i,
+  /провідник/i
+];
 
 const MAIN_SHEET_NAME = 'Main';
 const HANDBOOK_SHEET_NAME = 'Handbook';
