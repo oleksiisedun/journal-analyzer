@@ -54,7 +54,8 @@ function columnNumber_(sheet, columnRangeA1) {
 }
 
 /**
- * Reads a position-name list from the Handbook sheet, trimmed and with blanks dropped.
+ * Reads a position-name list from the Handbook sheet, trimmed, with blanks dropped
+ * and duplicates removed (first occurrence wins).
  * @param {string} listKey a key of POSITION_LIST_COLUMNS (already validated by the caller)
  * @returns {string[]}
  */
@@ -68,7 +69,8 @@ function readPositionNames_(listKey) {
   const col = columnNumber_(sheet, POSITION_LIST_COLUMNS[listKey]);
   const values = sheet.getRange(2, col, lastRow - 1, 1).getValues();
 
-  return values.map((row) => String(row[0]).trim()).filter((name) => name.length > 0);
+  const names = values.map((row) => String(row[0]).trim()).filter((name) => name.length > 0);
+  return [...new Set(names)];
 }
 
 /**
