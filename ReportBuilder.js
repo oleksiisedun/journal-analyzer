@@ -21,8 +21,10 @@ function escapeRegExp_(text) {
 
 /**
  * Scans document lines for personnel entries under matching position headers.
- * Lines matching any of IGNORE_LINE_REGEXES are skipped entirely before any other check —
- * they neither end nor extend the current block, and are never recorded as personnel.
+ * Each line has a leading list-number marker (e.g. "1)", "2.") stripped before any other
+ * check, so numbering never distorts word-count/header/block-end detection. Lines matching
+ * any of IGNORE_LINE_REGEXES are then skipped entirely before any other check — they
+ * neither end nor extend the current block, and are never recorded as personnel.
  * A block ends on: a line matching headerRegex (starts a new block instead), a quoted
  * "position name"-shaped line that does NOT match headerRegex (some other position), a
  * line longer than HEADER_LINE_MAX_LENGTH (non-personnel text), a blank line, a line
@@ -30,14 +32,14 @@ function escapeRegExp_(text) {
  * or a line matching any of BLOCK_END_REGEXES (other known non-personnel markers).
  * @param {string[]} lines
  * @param {RegExp} headerRegex
- * @returns {string[]} trimmed personnel entries (trailing ";"/"." stripped), in document order
+ * @returns {string[]} trimmed personnel entries (see trimTrailingPunctuation_), in document order
  */
 function scanLinesForPersonnel_(lines, headerRegex) {
   const entries = [];
   let inMatchingBlock = false;
 
   for (const rawLine of lines) {
-    const line = rawLine.trim();
+    const line = rawLine.trim().replace(LEADING_LIST_NUMBER_REGEX, '');
 
     if (IGNORE_LINE_REGEXES.some((regex) => regex.test(line))) continue;
 
@@ -64,10 +66,23 @@ function scanLinesForPersonnel_(lines, headerRegex) {
       continue;
     }
 
-    if (inMatchingBlock) entries.push(line.replace(/[;.]+$/, ''));
+    if (inMatchingBlock) entries.push(trimTrailingPunctuation_(line));
   }
 
   return entries;
+}
+
+/**
+ * Strips a trailing run of ";" (always) and a trailing run of "." — but only when that
+ * dot isn't a single-letter initial's dot (e.g. keeps "Іванов О.В." intact, while still
+ * stripping a genuine stray trailing "." that source docs sometimes append).
+ * @param {string} line
+ * @returns {string}
+ */
+function trimTrailingPunctuation_(line) {
+  const withoutSemicolons = line.replace(/;+$/, '');
+  if (TRAILING_INITIAL_REGEX.test(withoutSemicolons)) return withoutSemicolons;
+  return withoutSemicolons.replace(/\.+$/, '');
 }
 
 /**

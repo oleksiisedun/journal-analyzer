@@ -2,6 +2,8 @@ const POSITION_HEADER_TEMPLATE = '^.+[«"“]POSITION_NAME[»"”].+$';
 
 const GENERIC_POSITION_HEADER_REGEX = /[«"“].+[»"”]/;
 const BLOCK_END_REGEXES = [/ппд/i, /бпла/i];
+const LEADING_LIST_NUMBER_REGEX = /^\d+[).]\s*/;
+const TRAILING_INITIAL_REGEX = /\p{Lu}\.$/u;
 const IGNORE_LINE_REGEXES = [
   /заведено:/i,
   /виведено:/i,
