@@ -28,9 +28,10 @@ function escapeRegExp_(text) {
  * neither end nor extend the current block, and are never recorded as personnel.
  * A block ends on: a line matching headerRegex (starts a new block instead), a quoted
  * "position name"-shaped line that does NOT match headerRegex (some other position), a
- * line longer than HEADER_LINE_MAX_LENGTH (non-personnel text), a blank line, a line
- * with fewer than 3 words (a "rank + surname + initials" name always has at least 3),
- * or a line matching any of BLOCK_END_REGEXES (other known non-personnel markers).
+ * blank line, a line matching any of BLOCK_END_REGEXES (other known non-personnel markers),
+ * or a line matching none of RANK_REGEXES (Config.js — recognized rank prefixes; a personnel
+ * line always starts with a military rank, so a line without one isn't a person). Rank is
+ * the source of truth for "is this a person" — there is no separate word-count check.
  * @param {string[]} lines
  * @param {RegExp} headerRegex
  * @returns {string[]} trimmed personnel entries (see trimTrailingPunctuation_), in document order
@@ -54,14 +55,13 @@ function scanLinesForPersonnel_(lines, headerRegex) {
       continue;
     }
 
-    const wordCount = line.split(/\s+/).filter(Boolean).length;
     const matchesBlockEndRegex = BLOCK_END_REGEXES.some((regex) => regex.test(line));
+    const hasRank = RANK_REGEXES.some((regex) => regex.test(line));
 
     if (
       GENERIC_POSITION_HEADER_REGEX.test(line) ||
-      line.length > HEADER_LINE_MAX_LENGTH ||
-      wordCount < 3 ||
-      matchesBlockEndRegex
+      matchesBlockEndRegex ||
+      !hasRank
     ) {
       inMatchingBlock = false;
       continue;

@@ -1,7 +1,8 @@
-const POSITION_HEADER_TEMPLATE = '^.+[«"“]POSITION_NAME[»"”].+$';
+const POSITION_HEADER_TEMPLATE = '^.+[«"“]POSITION_NAME[»"”].*$';
 
 const GENERIC_POSITION_HEADER_REGEX = /[«"“].+[»"”]/;
 const BLOCK_END_REGEXES = [/ппд/i, /бпла/i];
+const RANK_REGEXES = [/солд/i, /серж/i, /лейт/i, /капі/i, /полк/i];
 const LEADING_LIST_NUMBER_REGEX = /^\d+[).]\s*/;
 const LEADING_ROLE_LABELS = ['Пілот', 'Штурман'];
 const LEADING_ROLE_LABEL_REGEX = new RegExp(`^(?:${LEADING_ROLE_LABELS.join('|')}):\\s*`, 'i');
@@ -16,7 +17,6 @@ const IGNORE_LINE_REGEXES = [
 
 const MAIN_SHEET_NAME = 'Main';
 const HANDBOOK_SHEET_NAME = 'Handbook';
-const HEADER_LINE_MAX_LENGTH = 100;
 const CHUNK_TIME_BUDGET_MS = 1 * 60 * 1000;
 
 const FOLDER_LINK_COLUMN = 'B2:B';
