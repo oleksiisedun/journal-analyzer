@@ -1,4 +1,4 @@
-const POSITION_HEADER_TEMPLATE = '^.+[«"“]POSITION_NAME[»"”].{0,30}$';
+const POSITION_HEADER_TEMPLATE = '^.+[«"“]POSITION_NAME[»"”].+$';
 
 const GENERIC_POSITION_HEADER_REGEX = /[«"“].+[»"”]/;
 const BLOCK_END_REGEXES = [/ппд/i, /бпла/i];
