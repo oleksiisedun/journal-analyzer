@@ -2,7 +2,14 @@ const POSITION_HEADER_TEMPLATE = '^.+[«"“]POSITION_NAME[»"”].*$';
 
 const GENERIC_POSITION_HEADER_REGEX = /[«"“].+[»"”]/;
 const BLOCK_END_REGEXES = [/ппд/i, /бпла/i];
-const RANK_REGEXES = [/солд/i, /серж/i, /лейт/i, /капі/i, /полк/i];
+const RANK_REGEXES = [
+  /солд/i,
+  /серж/i,
+  /лейт/i,
+  /капітан/i,
+  /майор/i,
+  /полковник/i
+];
 const LEADING_LIST_NUMBER_REGEX = /^\d+[).]\s*/;
 const LEADING_ROLE_LABELS = ['Пілот', 'Штурман'];
 const LEADING_ROLE_LABEL_REGEX = new RegExp(`^(?:${LEADING_ROLE_LABELS.join('|')}):\\s*`, 'i');
