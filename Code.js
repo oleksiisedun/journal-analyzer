@@ -19,7 +19,8 @@ function runAnalyzer() {
       return;
     }
 
-    target = findTargetRow_(sheet);
+    const universalRegexMode = isUniversalPositionRegexEnabled_();
+    target = findTargetRow_(sheet, universalRegexMode);
     if (!target) {
       SpreadsheetApp.getUi().alert('No eligible row to process.');
       return;
@@ -32,11 +33,7 @@ function runAnalyzer() {
     lock.releaseLock();
   }
 
-  const positionNames = readPositionNames_(target.positionListKey);
-  if (positionNames.length === 0) {
-    throw new Error(`No position names found for list "${target.positionListKey}" in "${HANDBOOK_SHEET_NAME}".`);
-  }
-  const positionRegexSource = buildPositionHeaderRegex_(positionNames).source;
+  const positionRegexSource = resolvePositionRegexSource_(target.positionListKey);
 
   const initialState = {
     rowNum: target.rowNum,
@@ -55,6 +52,34 @@ function runAnalyzer() {
 
   const html = template.evaluate().setWidth(420).setHeight(260);
   SpreadsheetApp.getUi().showModalDialog(html, 'Journal Analyzer');
+}
+
+/**
+ * Resolves the source string for this run's position-header regex: the universal regex
+ * from Handbook!C2 when a positionListKey of null signals universal-regex mode was
+ * selected by findTargetRow_, otherwise the legacy name-list-built regex.
+ * @param {string|null} positionListKey
+ * @returns {string}
+ */
+function resolvePositionRegexSource_(positionListKey) {
+  if (positionListKey === null) {
+    const source = readUniversalPositionRegexSource_();
+    if (!source) {
+      throw new Error(`Universal position regex is enabled but Handbook!${HANDBOOK_REGEX_CELL} is empty.`);
+    }
+    try {
+      new RegExp(source);
+    } catch (e) {
+      throw new Error(`Invalid regex in Handbook!${HANDBOOK_REGEX_CELL}: ${e.message}`);
+    }
+    return source;
+  }
+
+  const positionNames = readPositionNames_(positionListKey);
+  if (positionNames.length === 0) {
+    throw new Error(`No position names found for list "${positionListKey}" in "${HANDBOOK_SHEET_NAME}".`);
+  }
+  return buildPositionHeaderRegex_(positionNames).source;
 }
 
 /**

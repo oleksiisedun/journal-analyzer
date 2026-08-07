@@ -31,6 +31,8 @@ const POSITION_LIST_COLUMNS = {
   '170': 'A2:A',
   '70': 'B2:B',
 };
+const HANDBOOK_REGEX_MODE_CELL = 'D1';
+const HANDBOOK_REGEX_CELL = 'C2';
 
 const CHUNK_TIME_BUDGET_MS = 1 * 60 * 1000;
 

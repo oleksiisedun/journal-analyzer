@@ -1,10 +1,13 @@
 /**
  * Scans the Main sheet from row 2 down and returns the first row ready to process,
  * writing error markers into the report column for any invalid rows encountered along the way.
+ * When universalRegexMode is true, Main!C's 170/70 choice is irrelevant to eligibility —
+ * only a non-empty folder link and an empty report cell are required.
  * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet
- * @returns {{rowNum: number, reportCol: number, folder: GoogleAppsScript.Drive.Folder, positionListKey: string}|null}
+ * @param {boolean} universalRegexMode
+ * @returns {{rowNum: number, reportCol: number, folder: GoogleAppsScript.Drive.Folder, positionListKey: string|null}|null}
  */
-function findTargetRow_(sheet) {
+function findTargetRow_(sheet, universalRegexMode) {
   const lastRow = sheet.getLastRow();
   if (lastRow < 2) return null;
 
@@ -27,6 +30,10 @@ function findTargetRow_(sheet) {
     if (!folder) {
       sheet.getRange(rowNum, reportCol).setValue(ERROR_INVALID_LINK);
       continue;
+    }
+
+    if (universalRegexMode) {
+      return { rowNum, reportCol, folder, positionListKey: null };
     }
 
     if (!positionListKey) continue;
@@ -71,6 +78,28 @@ function readPositionNames_(listKey) {
 
   const names = values.map((row) => String(row[0]).trim()).filter((name) => name.length > 0);
   return [...new Set(names)];
+}
+
+/**
+ * Reads the Handbook!D1 checkbox controlling whether a universal regex (Handbook!C2)
+ * replaces the per-list Handbook position-name lookup. An unconfigured or non-checkbox
+ * cell reads as something other than boolean true, safely falling back to legacy behavior.
+ * @returns {boolean}
+ */
+function isUniversalPositionRegexEnabled_() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(HANDBOOK_SHEET_NAME);
+  if (!sheet) throw new Error(`Sheet "${HANDBOOK_SHEET_NAME}" not found.`);
+  return sheet.getRange(HANDBOOK_REGEX_MODE_CELL).getValue() === true;
+}
+
+/**
+ * Reads the universal position-header regex source string from Handbook!C2, trimmed.
+ * @returns {string}
+ */
+function readUniversalPositionRegexSource_() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(HANDBOOK_SHEET_NAME);
+  if (!sheet) throw new Error(`Sheet "${HANDBOOK_SHEET_NAME}" not found.`);
+  return String(sheet.getRange(HANDBOOK_REGEX_CELL).getValue()).trim();
 }
 
 /**
