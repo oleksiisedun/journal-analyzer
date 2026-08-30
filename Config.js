@@ -3,9 +3,9 @@ const POSITION_HEADER_TEMPLATE = '^.+[«"“]POSITION_NAME[»"”].*$';
 const GENERIC_POSITION_HEADER_REGEX = /[«"“].+[»"”]/;
 const BLOCK_END_REGEXES = [/ппд/i, /бпла/i];
 const RANK_REGEXES = [
-  /солд/i,
-  /серж/i,
-  /лейт/i,
+  /солдат/i,
+  /сержант/i,
+  /лейтенант/i,
   /капітан/i,
   /майор/i,
   /полковник/i
