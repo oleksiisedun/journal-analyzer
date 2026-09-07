@@ -9,11 +9,13 @@ A Google Apps Script (clasp-managed) project bound to a Google Sheet. It automat
 3. `clasp open` to open the Apps Script editor — useful to confirm the Drive Advanced Service is enabled with no error, or to read execution logs.
 4. Reload the bound spreadsheet to pick up the "Journal Analyzer" custom menu.
 
+For a new bound spreadsheet, import [`samples/Journal Analyzer.xlsx`](samples/Journal%20Analyzer.xlsx) (File → Import → Insert new sheet(s), in Google Sheets) to get a pre-built `Main`/`Handbook` sheet layout to start from, rather than creating both sheets by hand.
+
 The script requests the broad `.../auth/drive` OAuth scope (not just `drive.file`), since it must read arbitrary pre-existing Drive folders rather than only files it created itself. `appsscript.json` leaves `oauthScopes` unset so Apps Script auto-detects this from code.
 
 ## Sheet contract
 
-The bound spreadsheet must have a sheet named `Main`. Each row is one analysis job:
+The bound spreadsheet must have a sheet named `Main`. Each row is one analysis job (see [`samples/Journal Analyzer.xlsx`](samples/Journal%20Analyzer.xlsx) for a filled-in example of both sheets):
 
 - **B** — a Google Drive folder link or bare folder ID
 - **C** — `170` or `70`, picked from a dropdown (configured manually in the Sheets UI) selecting which Handbook position-name list applies to this row
